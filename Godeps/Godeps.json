@@ -1,0 +1,15 @@
+{
+	"ImportPath": "uber_foodtrucks",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "go-priority-queue/prio",
+			"Comment": "null-25",
+			"Rev": "'de506d9b98fd363c2eeff2e70bfad6709db19dd2'"
+		},
+		{
+			"ImportPath": "kdtree",
+			"Rev": "a2f5c252a80aed721fe5a54aef6390871f33ee77"
+		}
+	]
+}

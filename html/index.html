@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+        <meta charset="utf-8">
+        <title>San Francisco - Food Truck Locator</title>
+        <link href="gmap.css" media="screen" rel="stylesheet" type="text/css" />
+        <style>
+        table {
+            border-spacing:0;
+            border-collapse: collapse;
+        }
+        td,tr {
+            border-spacing:0;
+            border-collapse: collapse;
+        }
+        tr,td,th {
+            border-bottom: 1px solid black;
+        }
+        </style>
+    </head>
+
+    <body>
+
+        <div id='container'>
+            <label for="rad">Radius: </label>
+                <input type="range" min="0.5" max="5.0" value="0.50" align="center" id="rad" step="0.25" oninput="radiusChangeUpdate(value)">
+                <output for="rad" id="radius">0.50</output>
+                <p></p>
+                <label for="tru">Count:  </label>
+                <input type="range" min="5" max="25" value="10" id="tru" step="5" oninput="truckCountUpdate(value)">
+                <output for="tru" id="trucks">10</output>
+                <p></p>
+                <table id="results"></table>
+        </div>
+        
+        <div id='searchbox'>
+        <input id="pac-input" class="controls" type="text" placeholder="Enter the address">
+        </div>
+ 
+        <div id='gmap-canvas'></div>
+        
+        <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
+        <script src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
+        <script type="text/javascript" src="gmap.js"></script>
+
+    </body>
+</html>
