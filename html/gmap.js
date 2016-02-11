@@ -5,6 +5,7 @@ var map;
 
 // marker, info window variables
 var anchor_marker;
+var pop_marker;
 var infowindow;
 
 var markers = [];
@@ -29,8 +30,16 @@ var curLat;
 var curLng;
 var curRadius;
 var curCount;
-var anchor_icon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+var curTypes;
 
+// locations
+var defaultLocation
+var curLocation
+
+// copied the icon from http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+var anchor_icon = 'blue-dot.png'
+var truck_icon = 'truck16_black.png'
+var pop_icon = 'red-dot.png'
 var mrkr;
 
 // Initialize the main map
@@ -39,15 +48,20 @@ function initializeMap() {
 	
 	// Create the SF map with the center of city as initial value
 	var sfcity = new google.maps.LatLng(37.78, -122.454150)
+	
+	defaultLocation = new google.maps.LatLng(37.78, -122.454150)
+	curLocation = new google.maps.LatLng(37.78, -122.454150)
+
 	map = new google.maps.Map(document.getElementById('gmap-canvas'), {
-		zoom: 14,
-		center: sfcity,
+		zoom: 1,
+		center: defaultLocation,
 		mapTypeId: google.maps.MapTypeId.ROADMAP
 	});
 
 	index = 0;
 	curRadius = 800;
 	curCount = 10;
+	curTypes = [];
 
 	// create all the google map services
 	geocoder = new google.maps.Geocoder;
@@ -55,7 +69,7 @@ function initializeMap() {
 	directionsDisplay = new google.maps.DirectionsRenderer;
 
 	directionsDisplay.setMap(map);
-	directionsDisplay.setOptions( { suppressMarkers: true } );
+	directionsDisplay.setOptions( { suppressMarkers: true, preserveViewport: true } );
 
 	infowindow = new google.maps.InfoWindow;
 	infowindow.setContent('San Francisco');
@@ -66,9 +80,18 @@ function initializeMap() {
 
 	anchor_marker = new google.maps.Marker({
 		map: map,
-		position: sfcity,
+		position: defaultLocation,
 		icon: anchor_icon,
 		draggable: true
+	});
+
+	pop_marker = new google.maps.Marker({
+		map:map,
+		animation: google.maps.Animation.DROP,
+		icon: pop_icon,
+		clickable: false,
+		zIndex: 10,
+		optimized: false
 	});
 
 	// Create the search box and link it to the UI element.
@@ -78,11 +101,11 @@ function initializeMap() {
 	);
 
 	input = document.getElementById('pac-input');
-	//var autocomplete  = new google.maps.places.Autocomplete(input);
+
 	searchBox = new google.maps.places.SearchBox(input, {
 		bounds: defaultBounds
 	});
-	map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+	//map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
 	// Bias the SearchBox results towards current map's viewport.
 	map.addListener('bounds_changed', function() {
@@ -106,10 +129,10 @@ function initializeMap() {
 	// Circle marker shows the desired area of search
 	circle_marker = new google.maps.Circle({
 		strokeColor: '#FFA700',
-		strokeOpacity: 0.9,
-		strokeWeight: 4,
-		fillColor: '#000000',
-		fillOpacity: 0.35,
+		strokeOpacity: 0.8,
+		strokeWeight: 2,
+		fillColor: '#000040',
+		fillOpacity: 0.2,
 		map: map,
 		radius: curRadius,
 		clickable: false
@@ -136,19 +159,92 @@ function initializeMap() {
 }
 
 
-// Add marker at truck location
+function setDefaultLocation() {
+	map.setCenter(defaultLocation)
+	setCurLocation(defaultLocation.lat, defaultLocation.lng)
+	placeMarkerAndPanTo(defaultLocation, map)
+}
 
-function addTruckLocationMarker(location, id, name, address, fooditems) {
+function setCurLocation(lat, lng) {
+	curLocation = new google.maps.LatLng(lat,lng);
+}
+
+function updateCurrentLocation() {
+	
+	if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function(position) {
+			var pos  = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+			map.setCenter(pos);
+			placeMarkerAndPanTo(pos,map)
+			setCurLocation(position.coords.latitude,position.coords.longitude);
+		}, function() {
+			handleLocationError(true, infoWindow, map.getCenter());
+		});
+	} else {
+    	// Browser doesn't support Geolocation
+    	handleLocationError(false, infoWindow, map.getCenter());
+    }
+
+}
+
+function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+  infoWindow.setPosition(pos);
+  infoWindow.setContent(browserHasGeolocation ?
+                        'Error: The Geolocation service failed.' :
+                        'Error: Your browser doesn\'t support geolocation.');
+}
+
+function initializeFoodCategories() {
+// READ the food categories file
+  	$.getJSON('./food_categories.json', function(data) {
+    	initializeFoodtypes(data)
+	});
+}
+
+
+function initializeFoodtypes(data) {
+	var innerhtml = ""
+	
+	for (var i = 0; i < data.length ; i++) {
+		innerhtml = innerhtml + "<li><input class=\"ftype_cbox\" type=\"checkbox\" value=" + data[i].name + " name=\"foodtype\"/> <label>"+data[i].name+"</label></li>"
+	}
+	document.getElementById('foodtypes').innerHTML = innerhtml;
+}
+
+function initializeApp() {
+	initializeMap()
+	initializeFoodCategories()
+}
+
+$('#foodtypes').on('change', 'input[type=checkbox]', function(e) {
+	var types = [];
+	$.each($("input[name='foodtype']:checked"), function(){            
+        types.push($(this).val());
+    });
+    foodTypeUpdate(types)
+ });
+
+
+function popMarker(lat, lng) {
+	var loc = new google.maps.LatLng(lat, lng) 
+	pop_marker.setPosition(loc);
+	pop_marker.setVisible(true);
+	m_infowindow.close();
+	directionsDisplay.setDirections({routes: []});
+}
+
+function addTruckLocationMarker(id,obj) { 
+	var loc = {lat: obj.LL.Lat, lng: obj.LL.Lng};
 
 	var marker = new google.maps.Marker({
-		position: location,
+		position: loc,
 		map: map,
+		icon: truck_icon,
 		clickable: true
 	});
 
-
 	google.maps.event.addListener(marker, 'click', function() {
-		m_infowindow.setContent("<b>" + name + "</b>" + "<br>" + address + "<br>" + fooditems)
+		m_infowindow.setContent("<b>" + obj.Name + "</b>" + "<br>" + obj.Address + "<br><p>" + obj.Fooditems + "</p><br>" + "<b>Food Types: </b>" + obj.Foodtypes)
 		m_infowindow.open(map, marker)
 		directionsDisplay.setDirections({routes: []});
 	});
@@ -156,6 +252,25 @@ function addTruckLocationMarker(location, id, name, address, fooditems) {
 	markers.push(marker);
 	return marker;
 }
+
+// Add marker at truck location
+// function addTruckLocationMarker(location, id, name, address, fooditems) {
+
+// 	var marker = new google.maps.Marker({
+// 		position: location,
+// 		map: map,
+// 		clickable: true
+// 	});
+
+// 	google.maps.event.addListener(marker, 'click', function() {
+// 		m_infowindow.setContent("<b>" + name + "</b>" + "<br>" + address + "<br>" + fooditems)
+// 		m_infowindow.open(map, marker)
+// 		directionsDisplay.setDirections({routes: []});
+// 	});
+
+// 	markers.push(marker);
+// 	return marker;
+// }
 
 // Sets the map on all markers in the array.
 function setMapOnAll(map) {
@@ -176,22 +291,16 @@ function showMarkers() {
 
 // Deletes all markers in the array by removing references to them.
 function deleteMarkers() {
+	directionsDisplay.setDirections({routes: []});
+	pop_marker.setVisible(false)
 	clearMarkers();
 	markers = [];
-}
-
-// Get the json for a given URL
-function GetJson(yourUrl) {
-	var Httpreq = new XMLHttpRequest(); // a new request
-	Httpreq.open("GET", yourUrl, false);
-	Httpreq.send(null);
-	return Httpreq.responseText;
 }
 
 // Place the anchor_marker and pan to the location
 function placeMarkerAndPanTo(latLng, map) {
 	index = index + 1;
-	map.panTo(latLng);
+	//map.panTo(latLng);
 
 	geocoder.geocode({
 		'location': latLng
@@ -208,6 +317,8 @@ function placeMarkerAndPanTo(latLng, map) {
 	});
 
 	anchor_marker.setPosition(latLng);
+	setCurLocation(latLng.lat(), latLng.lng())
+	map.fitBounds(circle_marker.getBounds());
 
 	curLat = latLng.lat();
 	curLng = latLng.lng();
@@ -215,57 +326,69 @@ function placeMarkerAndPanTo(latLng, map) {
 }
 
 function doSearchAndUpdate() {
-	var searchurl = "/search?lat=" + curLat + "&lng=" + curLng + "&radius=" + curRadius + "&count=" + curCount;
-	var json_obj = JSON.parse(GetJson(searchurl));
+	var searchurl = "/Trucks?lat=" + curLat + "&lng=" + curLng + "&radius=" + curRadius + "&count=" + curCount +"&types=" + curTypes;
+	$.ajax({
+		type: 'GET',
+		url: searchurl,
+		data: {},
+		dataType: 'json',
+		success: function(data) 
+		{ 
+			populateTruckLocations(data) 
+		},
+		error: function() { alert('Error occured while getting food truck locations !!!'); }
+	});
+}
 
+function populateTruckLocations(data) {
 	deleteMarkers();
-
+	map.fitBounds(circle_marker.getBounds())
 	// Create table entries for the results from the query
 	var innerhtml = "";
-	if (json_obj) {
-		for (var i = 0; i < json_obj.length; i++) {
-			var obj = json_obj[i];
-			var loc = {
-				lat: obj.Lat,
-				lng: obj.Lng
-			};
+
+
+	//var bounds = new google.maps.LatLngBounds()
+	//bounds.extend(curLocation)
+
+	if (data) {
+		for (var i = 0; i < data.length; i++) {
+			var obj = data[i];
+			var loc = {lat: obj.LL.Lat, lng: obj.LL.Lng};
 			var id = "";
 			id = id + i;
-			addTruckLocationMarker(loc, id, obj.Name, obj.Address, obj.Fooditems)
+			//var tmp = new google.maps.LatLng(loc.lat, loc.lng)
+			//bounds.extend(tmp);
+			//addTruckLocationMarker(loc, id, obj.Name, obj.Address, obj.Fooditems,)
+			addTruckLocationMarker(id,obj)
+			// innerhtml = innerhtml + "<tr style=color:black onclick= " + 'mouseover(this,' + i + ') '
+			// innerhtml = innerhtml + " onmouseout= " + 'mouseout(this,' + i + ')> '
+			// innerhtml = innerhtml + "<td>" + "<b>" + obj.Name + "</b>" + "<br>"
+			// innerhtml = innerhtml + obj.Address + '<br><font color="green">' + obj.Distance.toFixed(2) + " miles </font><br>"
+			// innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"DRIVING\")>' + 'Drive</a>'
+			// innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"WALKING\")>&nbsp;&nbsp;&nbsp;&nbsp' + 'Walk</a>'
+			// innerhtml = innerhtml + "</td>" + "</tr>" ;
 
-			innerhtml = innerhtml + "<tr style=color:black onclick= " + 'mouseover(this,' + i + ') '
-			innerhtml = innerhtml + " onmouseout= " + 'mouseout(this,' + i + ')> '
-			innerhtml = innerhtml + "<td>" + "<b>" + obj.Name + "</b>" + "<br>"
-			innerhtml = innerhtml + obj.Address + '<br><font color="green">' + obj.Distance.toFixed(2) + " miles </font><br>"
-			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'foo(' + curLat + ',' + curLng + ',' + obj.Lat + ',' + obj.Lng + ',\"DRIVING\")>' + 'Drive</a>'
-			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'foo(' + curLat + ',' + curLng + ',' + obj.Lat + ',' + obj.Lng + ',\"WALKING\")>&nbsp;&nbsp;&nbsp;&nbsp' + 'Walk</a>'
-			innerhtml = innerhtml + "</td>" + "</tr>" ;
+			innerhtml = innerhtml + "<tr><td>" 
+
+			innerhtml = innerhtml + "<a onclick= " + 'showInfoWindow('+i+')' +' onmouseover= popMarker(' + loc.lat + ',' + loc.lng+ ')>' 
+			innerhtml = innerhtml + "<b>" + obj.Name + "</b>" + "<br>" +  obj.Address + '<br><font color="green">' + obj.Distance.toFixed(2) + " miles </font></a><br>"
+			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"DRIVING\")>' + 'Drive</a>'
+			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"WALKING\")>&nbsp;&nbsp;&nbsp;&nbsp' + 'Walk</a>'
+			innerhtml = innerhtml + "</td></tr>" ;
 		}
 	} else {
 		innerhtml = "<p>" + "No results found !! " + "</p>";
 	}
-
+	//map.fitBounds(bounds);
 	document.getElementById('results').innerHTML = innerhtml;
 }
 
-/*
-directionsService.route(request, function(response, status) {
-    if (status == google.maps.DirectionsStatus.OK) {
-      directionsDisplay.setDirections(response);
-      // add start and end markers
-      startMarker = new google.maps.Marker({
-        position: response.mc.origin,
-        icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png',
-        map: map
-      });
-      endMarker = new google.maps.Marker({
-        position: response.mc.destination,
-        map: map
-      });
-    }
-  });
-*/
-function foo(clat, clng, dlat, dlng, mode) {
+function showInfoWindow(id) {
+	google.maps.event.trigger(markers[id], 'click');
+}
+
+function findDirection(clat, clng, dlat, dlng, mode) {
+	popMarker(dlat, dlng);
 	var origin_latlng = new google.maps.LatLng(clat, clng)
 	var dest_latlng = new google.maps.LatLng(dlat, dlng);
 
@@ -283,13 +406,19 @@ function foo(clat, clng, dlat, dlng, mode) {
 }
 
 // Function for mouse click on a row of the table element
-function mouseover(row, id) {
-	google.maps.event.trigger(markers[id], 'click');
-	directionsDisplay.setDirections({routes: []});
-}
+// function mouseover(row, id) {
+// 	google.maps.event.trigger(markers[id], 'click');
+// 	directionsDisplay.setDirections({routes: []});
+// }
 
-function mouseout(row, id) {
+// function mouseout(row, id) {
 
+// }
+
+function foodTypeUpdate(val) {
+	//document.querySelector('#fcat').val = val;
+	curTypes = val;
+	doSearchAndUpdate()
 }
 
 function truckCountUpdate(val) {
@@ -301,10 +430,11 @@ function truckCountUpdate(val) {
 function radiusChangeUpdate(val) {
 	document.querySelector('#radius').value = val;
 	// Converting to meters
-	curRadius = val * 1600;
+	curRadius = val * 1609;
 	circle_marker.setRadius(curRadius)
+	map.fitBounds(circle_marker.getBounds())
 	doSearchAndUpdate()
 }
 
 // Initialize the google map on load
-google.maps.event.addDomListener(window, 'load', initializeMap);
+google.maps.event.addDomListener(window, 'load', initializeApp);

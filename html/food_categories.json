@@ -1,0 +1,44 @@
+[
+{
+	"name" : "American", 
+	"keywords" : "beef fries bbq melts cheese burgers ribs mac bacon pizza baked sausage"
+}
+,{
+	"name":"Chinese", 
+	"keywords":"mein noodle pork buns rice fried"
+}
+,{
+	"name":"Coffee/Tea", 
+	"keywords":"espresso coffee mocha tea chai cappucino"
+}
+,{
+	"name":"Indian/Pakistani", 
+	"keywords":"curry lassi india pakistan rice lamb vegetarian masala samosa halal"
+}
+,{
+	"name":"Mediterranean", 
+	"keywords":"pita gyros yogurt kebab gyro wrap"
+}
+,{
+	"name":"Healthy", 
+	"keywords":"seeds yogurt salad milk kale fruits"
+}
+,{
+	"name":"Mexican", 
+	"keywords":"quesa cevi tortas horchata burrito burritos tacos nachos churros relleno aguas mexican taco"
+}
+,{
+	"name":"Sandwiches", 
+	"keywords":"sandwich bread sandwiches melt slider sliders dogs hotdog"
+}
+,{
+	"name":"Seafood", 
+	"keywords":"fish seafood lobster shrimp clam salmon catfish"
+}
+,{
+	"name":"Snacks", 
+	"keywords":"pretzels chips snacks popcorn fries corn candy"
+}
+
+]
+

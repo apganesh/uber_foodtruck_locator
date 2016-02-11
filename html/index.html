@@ -23,7 +23,9 @@
     <body>
 
         <div id='container'>
-            <label for="rad">Radius: </label>
+        <fieldset>
+        <legend>Constraints</legend>
+                <label for="rad">Radius: </label>
                 <input type="range" min="0.5" max="5.0" value="0.50" align="center" id="rad" step="0.25" oninput="radiusChangeUpdate(value)">
                 <output for="rad" id="radius">0.50</output>
                 <p></p>
@@ -31,17 +33,32 @@
                 <input type="range" min="5" max="25" value="10" id="tru" step="5" oninput="truckCountUpdate(value)">
                 <output for="tru" id="trucks">10</output>
                 <p></p>
-                <table id="results"></table>
+            </fieldset>
+            <fieldset>
+                <legend>Foodtypes</legend>
+                <ul class="foodboxes" id="foodtypes"></ul>
+            </fieldset>
+
+            <fieldset>
+                <legend>Foodtrucks</legend>
+                <div id="restable">
+                <table class="ftresults" id="results"></table>
+                </div>
+            </fieldset>
+            
         </div>
-        
+
         <div id='searchbox'>
-        <input id="pac-input" class="controls" type="text" placeholder="Enter the address">
+            <input onclick="setDefaultLocation();" type=button value="Default Location">
+            <input onclick="updateCurrentLocation();" type=button value="Current Location">
+            <input id="pac-input" class="controls" type="text" placeholder="Enter the address">
         </div>
  
         <div id='gmap-canvas'></div>
         
         <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?libraries=places"></script>
-        <script src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerwithlabel/src/markerwithlabel.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+        
         <script type="text/javascript" src="gmap.js"></script>
 
     </body>

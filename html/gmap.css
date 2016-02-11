@@ -12,10 +12,22 @@
 
 #searchbox {
   z-index: 100;
-  position: relative;
+  top: 20px;
+  position: absolute;
   margin-left: 100px;
+  left: 20%;
+  font-family: Roboto;
+  font-size: 20px;
+  font-weight: 200;
 }
 
+#pac-input {
+  background-color: #fff;
+  width: 400px;
+
+}
+
+/*
 #pac-input {
   background-color: #fff;
   margin-left: 12px;
@@ -24,39 +36,53 @@
   font-family: Roboto;
   font-size: 15px;
   font-weight: 200;
+  position: relative;
   text-overflow: ellipsis;
 }
 
 #pac-input:focus {
   border-color: #4d90fe;
   margin-left: -1px;
-  padding-left: 14px;  /* Regular padding-left + 1. */
+  padding-left: 14px;  
   width: 401px;
 }
+*/
 
 #container {
-  /*background-color:#FFF9F9;*/
-  height: 725px;
+
+  height: 700px;
   z-index: 100;
   float: right;
   width:24%;
   margin-left: 2px;
   position: relative;
-  overflow-y: auto;
   font-family: Roboto;
-  font-size: 15px;
-  font-weight: 200;
-  /*max-height: 100%;*/
+  font-size: 13px;
+  font-weight: 150;
 }
 
 #results {
   width: 100%;
   overflow-y: auto;
-  max-height:725px;
+  max-height:625px;
   margin-left:5px;
   font-family:Roboto;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 200;
+}
+
+#restable {
+  width: 100%;
+  overflow-y: auto;
+  max-height:625px;
+  margin-left:5px;
+  font-family:Roboto;
+  font-size: 13px;
+  font-weight: 200;
+}
+
+.ftresults {
+  overflow-y: auto;
 }
 
 #labels {
@@ -64,4 +90,15 @@
   text-align: center;
   font-weight: 200;
   color: 'black';
+}
+
+
+.foodboxes ul {
+  list-style-position: outside;
+}
+
+.foodboxes li {
+ display: block;
+float: left;
+  width: 50%;
 }
