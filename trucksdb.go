@@ -3,10 +3,10 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"go-priority-queue/prio"
 	"net/http"
 	"sort"
 	"strings"
+	"uber_foodtruck_locator/Godeps/_workspace/src/go-priority-queue/prio"
 )
 
 //use the haversine distance

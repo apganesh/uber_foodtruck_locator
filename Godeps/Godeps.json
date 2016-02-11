@@ -1,0 +1,22 @@
+{
+	"ImportPath": "uber_foodtruck_locator",
+	"GoVersion": "go1.5",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/gorilla/context",
+			"Rev": "1c83b3eabd45b6d76072b66b746c20815fb2872d"
+		},
+		{
+			"ImportPath": "github.com/gorilla/mux",
+			"Rev": "26a6070f849969ba72b72256e9f14cf519751690"
+		},
+		{
+			"ImportPath": "go-priority-queue/prio",
+			"Comment": "null-25",
+			"Rev": "'de506d9b98fd363c2eeff2e70bfad6709db19dd2'"
+		}
+	]
+}

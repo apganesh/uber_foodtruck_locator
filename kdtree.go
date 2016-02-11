@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"go-priority-queue/prio"
 	"math"
+	"uber_foodtruck_locator/Godeps/_workspace/src/go-priority-queue/prio"
 )
 
 const kmtomiles = float64(0.621371192)

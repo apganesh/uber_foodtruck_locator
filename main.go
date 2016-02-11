@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
+	"uber_foodtruck_locator/Godeps/_workspace/src/github.com/gorilla/mux"
 )
 
 // Json file for the maps data
