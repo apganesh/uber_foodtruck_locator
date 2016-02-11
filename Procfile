@@ -1,1 +1,1 @@
-web: uber_foodtrucks
+web: uber_foodtruck_locator
