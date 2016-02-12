@@ -12,13 +12,12 @@
 
 #searchbox {
   z-index: 100;
-  top: 20px;
-  position: absolute;
-  margin-left: 100px;
-  left: 20%;
+  top: 10px;
+  position: relative;
+  left: 10%;
   font-family: Roboto;
   font-size: 20px;
-  font-weight: 200;
+  font-weight: 250;
 }
 
 #pac-input {
@@ -49,7 +48,6 @@
 */
 
 #container {
-
   height: 700px;
   z-index: 100;
   float: right;

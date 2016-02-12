@@ -25,11 +25,11 @@
         <div id='container'>
         <fieldset>
         <legend>Constraints</legend>
-                <label for="rad">Radius: </label>
+                <label for="rad">Radius (miles): </label>
                 <input type="range" min="0.5" max="5.0" value="0.50" align="center" id="rad" step="0.25" oninput="radiusChangeUpdate(value)">
                 <output for="rad" id="radius">0.50</output>
                 <p></p>
-                <label for="tru">Count:  </label>
+                <label for="tru">Count (trucks):  </label>
                 <input type="range" min="5" max="25" value="10" id="tru" step="5" oninput="truckCountUpdate(value)">
                 <output for="tru" id="trucks">10</output>
                 <p></p>
@@ -49,9 +49,9 @@
         </div>
 
         <div id='searchbox'>
+            <input id="pac-input" class="controls" type="text" placeholder="Enter the address">
             <input onclick="setDefaultLocation();" type=button value="Default Location">
             <input onclick="updateCurrentLocation();" type=button value="Current Location">
-            <input id="pac-input" class="controls" type="text" placeholder="Enter the address">
         </div>
  
         <div id='gmap-canvas'></div>
