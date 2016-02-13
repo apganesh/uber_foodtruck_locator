@@ -23,6 +23,7 @@ type JsonRes struct {
 	LL        LatLng
 	Distance  float64
 	Foodtypes []string
+	Dayhours  string
 }
 
 type TrucksRes []JsonRes
@@ -33,6 +34,7 @@ type Record struct {
 	Fooditems string
 	p         [2]float64
 	Foodtypes []string
+	Dayhours  string
 }
 
 type Records []*Record
@@ -57,6 +59,7 @@ func (tdb *TruckDB) readJsonFile() error {
 		Fooditems string  `json:"fooditems"`
 		Lat       float64 `json:"latitude,string"`
 		Lng       float64 `json:"longitude,string"`
+		Dayhours  string  `json:"dayshours"`
 	}
 
 	var elems []ObjectType
@@ -82,7 +85,7 @@ func (tdb *TruckDB) readJsonFile() error {
 			continue
 		}
 		fcats := getFoodCategories(p.Fooditems)
-		newRec := &Record{Address: p.Address, Name: p.Applicant, Fooditems: p.Fooditems, Foodtypes: fcats, p: [2]float64{p.Lat, p.Lng}}
+		newRec := &Record{Address: p.Address, Name: p.Applicant, Fooditems: p.Fooditems, Foodtypes: fcats, p: [2]float64{p.Lat, p.Lng}, Dayhours: p.Dayhours}
 		tdb.records = append(tdb.records, newRec)
 		index++
 	}
@@ -196,7 +199,7 @@ func (tdb *TruckDB) findNearestTrucks(ll LatLng, r float64, count int64, cats []
 		if common {
 			count--
 			//fmt.Println(dist, " -> ", ftypes)
-			res = append(res, JsonRes{r.Name, r.Address, r.Fooditems, LatLng{r.p[0], r.p[1]}, dist, r.Foodtypes})
+			res = append(res, JsonRes{r.Name, r.Address, r.Fooditems, LatLng{r.p[0], r.p[1]}, dist, r.Foodtypes, r.Dayhours})
 		}
 	}
 

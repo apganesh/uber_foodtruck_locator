@@ -69,7 +69,7 @@ func (root *KDNode) findNearestNeighborsRadius(ll LatLng, pq *prio.Queue, radius
 	dist := HaversineDistance(ll.Lng, ll.Lat, (*root.val).p[1], (*root.val).p[0])
 
 	if dist <= radius {
-		*res = append(*res, JsonRes{rec.Name, rec.Address, rec.Fooditems, LatLng{rec.p[0], rec.p[1]}, dist, rec.Foodtypes})
+		*res = append(*res, JsonRes{rec.Name, rec.Address, rec.Fooditems, LatLng{rec.p[0], rec.p[1]}, dist, rec.Foodtypes, rec.Dayhours})
 		pq.Push(&PQNode{root, dist, 0})
 	}
 	var diff float64

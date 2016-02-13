@@ -30,10 +30,9 @@ func main() {
 	if port == "" {
 		port = "4747"
 	}
-	fmt.Println("Listening on: ", port)
+	fmt.Println("Listening on port ", port)
 	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("Listening on port ", port)
 }

@@ -30,7 +30,6 @@ func initializeFoodCategories() {
 
 	json.Unmarshal(raw, &elems)
 
-	fmt.Printf("Total elems: %d\n", len(elems))
 	index := 1
 
 	for _, e := range elems {

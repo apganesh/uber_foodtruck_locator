@@ -31,6 +31,8 @@ var curLng;
 var curRadius;
 var curCount;
 var curTypes;
+var fitToBounds;
+var curBounds;
 
 // locations
 var defaultLocation
@@ -62,6 +64,7 @@ function initializeMap() {
 	curRadius = 800;
 	curCount = 10;
 	curTypes = [];
+	fitToBounds = true;
 
 	// create all the google map services
 	geocoder = new google.maps.Geocoder;
@@ -150,9 +153,11 @@ function initializeMap() {
 	});
 
 	// Callback for selecting a location
-	map.addListener('click', function(e) {
-		placeMarkerAndPanTo(e.latLng, map);
-	});
+	// Disbling click on the map as this causes too much confusion to the user 
+	// if he accidentaly clicks on map which clicking on a marker
+	//map.addListener('click', function(e) {
+	//	placeMarkerAndPanTo(e.latLng, map);
+	//});
 
 	// Place marker for the initial location
 	placeMarkerAndPanTo(sfcity, map)
@@ -224,6 +229,18 @@ $('#foodtypes').on('change', 'input[type=checkbox]', function(e) {
     foodTypeUpdate(types)
  });
 
+$('#fitbounds').click(
+	function() {
+		 if ($('#fitbounds').is(':checked')) {
+		 	fitToBounds = true;
+        }  else {
+        	fitToBounds = false;
+        }
+        fitToBoundsUpdate()
+	}
+);
+
+
 
 function popMarker(lat, lng) {
 	var loc = new google.maps.LatLng(lat, lng) 
@@ -244,7 +261,12 @@ function addTruckLocationMarker(id,obj) {
 	});
 
 	google.maps.event.addListener(marker, 'click', function() {
-		m_infowindow.setContent("<b>" + obj.Name + "</b>" + "<br>" + obj.Address + "<br><p>" + obj.Fooditems + "</p><br>" + "<b>Food Types: </b>" + obj.Foodtypes)
+		var htmlcontent = "<b>" + obj.Name + "</b>" + "<br>" + obj.Address + "<br><p>" 
+		htmlcontent = htmlcontent + obj.Fooditems + "</p><br>" 
+		htmlcontent = htmlcontent + "<b>Hours: </b>" + obj.Dayhours + "<br/>"
+		htmlcontent = htmlcontent + "<b>Food Types: </b>" + obj.Foodtypes
+
+		m_infowindow.setContent(htmlcontent)
 		m_infowindow.open(map, marker)
 		directionsDisplay.setDirections({routes: []});
 	});
@@ -253,24 +275,7 @@ function addTruckLocationMarker(id,obj) {
 	return marker;
 }
 
-// Add marker at truck location
-// function addTruckLocationMarker(location, id, name, address, fooditems) {
 
-// 	var marker = new google.maps.Marker({
-// 		position: location,
-// 		map: map,
-// 		clickable: true
-// 	});
-
-// 	google.maps.event.addListener(marker, 'click', function() {
-// 		m_infowindow.setContent("<b>" + name + "</b>" + "<br>" + address + "<br>" + fooditems)
-// 		m_infowindow.open(map, marker)
-// 		directionsDisplay.setDirections({routes: []});
-// 	});
-
-// 	markers.push(marker);
-// 	return marker;
-// }
 
 // Sets the map on all markers in the array.
 function setMapOnAll(map) {
@@ -342,44 +347,48 @@ function doSearchAndUpdate() {
 
 function populateTruckLocations(data) {
 	deleteMarkers();
-	map.fitBounds(circle_marker.getBounds())
+
 	// Create table entries for the results from the query
-	var innerhtml = "";
+	var innerhtml = "<tr><td></td></tr>";
 
 
-	//var bounds = new google.maps.LatLngBounds()
-	//bounds.extend(curLocation)
+	curBounds = new google.maps.LatLngBounds()
+	curBounds.extend(curLocation)
 
 	if (data) {
 		for (var i = 0; i < data.length; i++) {
 			var obj = data[i];
 			var loc = {lat: obj.LL.Lat, lng: obj.LL.Lng};
-			var id = "";
-			id = id + i;
-			//var tmp = new google.maps.LatLng(loc.lat, loc.lng)
-			//bounds.extend(tmp);
-			//addTruckLocationMarker(loc, id, obj.Name, obj.Address, obj.Fooditems,)
-			addTruckLocationMarker(id,obj)
-			// innerhtml = innerhtml + "<tr style=color:black onclick= " + 'mouseover(this,' + i + ') '
-			// innerhtml = innerhtml + " onmouseout= " + 'mouseout(this,' + i + ')> '
-			// innerhtml = innerhtml + "<td>" + "<b>" + obj.Name + "</b>" + "<br>"
-			// innerhtml = innerhtml + obj.Address + '<br><font color="green">' + obj.Distance.toFixed(2) + " miles </font><br>"
-			// innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"DRIVING\")>' + 'Drive</a>'
-			// innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"WALKING\")>&nbsp;&nbsp;&nbsp;&nbsp' + 'Walk</a>'
-			// innerhtml = innerhtml + "</td>" + "</tr>" ;
 
-			innerhtml = innerhtml + "<tr><td>" 
+			addTruckLocationMarker(i,obj)
+			var gLL = new google.maps.LatLng(loc.lat,loc.lng);
+			curBounds.extend(gLL);
 
-			innerhtml = innerhtml + "<a onclick= " + 'showInfoWindow('+i+')' +' onmouseover= popMarker(' + loc.lat + ',' + loc.lng+ ')>' 
-			innerhtml = innerhtml + "<b>" + obj.Name + "</b>" + "<br>" +  obj.Address + '<br><font color="green">' + obj.Distance.toFixed(2) + " miles </font></a><br>"
-			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"DRIVING\")>' + 'Drive</a>'
-			innerhtml = innerhtml + "<a style=\"color:blue\;\" onclick= " + 'findDirection(' + curLat + ',' + curLng + ',' + loc.lat + ',' + loc.lng + ',\"WALKING\")>&nbsp;&nbsp;&nbsp;&nbsp' + 'Walk</a>'
+			innerhtml = innerhtml + "<tr" +  ' onmouseover= popMarker(' + loc.lat + ',' + loc.lng+ ')>' 
+			innerhtml = innerhtml + "<td style=\"line-height:1.75\">" 
+			innerhtml = innerhtml + "<a onclick="+ 'showInfoWindow(' + i + ") </a>"
+			innerhtml = innerhtml + "<span class=\"leftalign\" style=\"color:navyblue;font-weight:bold\"><u>" + obj.Name + "</u></span></a>" 
+			innerhtml = innerhtml + "<span class=\"rightalign\" style=\"color:darkolivegreen\">" + obj.Distance.toFixed(2) + " miles </span><br/>"
+			innerhtml = innerhtml + "<span class=\"leftalign\">" + obj.Address + "</span>"
+			innerhtml = innerhtml + "<a class=\"blah\" onclick=" + 'findDirection(' + loc.lat + ',' + loc.lng + ',\"WALKING\")>'  
+			innerhtml = innerhtml + "<span class=\"rightalign\" style=\"color:darkolivegreen;font-weight:bold\">" + "<u>Directions</u>" + "</span></a><br/>"
+
+			innerhtml = innerhtml + '<b>Serving: </b>' + obj.Foodtypes[0]
+			for(var j = 1; j < obj.Foodtypes.length; j++) {
+				innerhtml = innerhtml  + ', ' + obj.Foodtypes[j] 
+			}
+
 			innerhtml = innerhtml + "</td></tr>" ;
 		}
 	} else {
 		innerhtml = "<p>" + "No results found !! " + "</p>";
 	}
-	//map.fitBounds(bounds);
+
+	if(fitToBounds) {
+		map.fitBounds(curBounds)
+	} else {
+		map.fitBounds(circle_marker.getBounds())
+	}
 	document.getElementById('results').innerHTML = innerhtml;
 }
 
@@ -387,9 +396,9 @@ function showInfoWindow(id) {
 	google.maps.event.trigger(markers[id], 'click');
 }
 
-function findDirection(clat, clng, dlat, dlng, mode) {
+function findDirection(dlat, dlng, mode) {
 	popMarker(dlat, dlng);
-	var origin_latlng = new google.maps.LatLng(clat, clng)
+	var origin_latlng = new google.maps.LatLng(curLat, curLng)
 	var dest_latlng = new google.maps.LatLng(dlat, dlng);
 
 	directionsService.route({
@@ -414,6 +423,12 @@ function findDirection(clat, clng, dlat, dlng, mode) {
 // function mouseout(row, id) {
 
 // }
+function fitToBoundsUpdate() {
+	if(fitToBounds)
+		map.fitBounds(curBounds)
+	else
+		map.fitBounds(circle_marker.getBounds())
+}
 
 function foodTypeUpdate(val) {
 	//document.querySelector('#fcat').val = val;
@@ -431,9 +446,9 @@ function radiusChangeUpdate(val) {
 	document.querySelector('#radius').value = val;
 	// Converting to meters
 	curRadius = val * 1609;
+	doSearchAndUpdate()
 	circle_marker.setRadius(curRadius)
 	map.fitBounds(circle_marker.getBounds())
-	doSearchAndUpdate()
 }
 
 // Initialize the google map on load
