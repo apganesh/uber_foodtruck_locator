@@ -192,13 +192,10 @@ func (tdb *TruckDB) findNearestTrucks(ll LatLng, r float64, count int64, cats []
 		x := pq.Remove(0)
 		r := x.(*PQNode).value.val
 		dist := x.(*PQNode).dist
-		//fmt.Println("--------------------------")
-		//fmt.Println("Distance: ", dist)
 		ftypes := r.Foodtypes
 		common := hasCommonTypes(cats, ftypes)
 		if common {
 			count--
-			//fmt.Println(dist, " -> ", ftypes)
 			res = append(res, JsonRes{r.Name, r.Address, r.Fooditems, LatLng{r.p[0], r.p[1]}, dist, r.Foodtypes, r.Dayhours})
 		}
 	}

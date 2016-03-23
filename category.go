@@ -60,9 +60,3 @@ func getFoodCategories(ss string) []string {
 	}
 	return cats
 }
-
-func testCategories() {
-	str := "sandwich"
-	res := getFoodCategories(str)
-	fmt.Println(res)
-}

@@ -10,12 +10,10 @@ import (
 
 // Json file for the maps data
 // https://data.sfgov.org/resource/rqzj-sfat.json
-// AIzaSyCYy0Pt6UolytUOtxbdFdGkUA3iao0UkrA -- serverkey for google distances
 
 func main() {
 	r := mux.NewRouter()
 	e := initializeTruckLocationServer()
-	//testCategories()
 
 	r.HandleFunc("/Trucks", TrucksHandler)
 
@@ -24,6 +22,7 @@ func main() {
 	} else {
 		r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("html/"))))
 	}
+
 	http.Handle("/", r)
 
 	var port = os.Getenv("PORT")

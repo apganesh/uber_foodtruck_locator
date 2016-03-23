@@ -11,7 +11,7 @@ import (
 
 // Json file for the maps data
 // https://data.sfgov.org/resource/rqzj-sfat.json
-// AIzaSyCYy0Pt6UolytUOtxbdFdGkUA3iao0UkrA -- serverkey for google distances
+
 var (
 	tdb *TruckDB
 )
@@ -37,7 +37,7 @@ func ErrorHandler(rw http.ResponseWriter, req *http.Request) {
 func TrucksHandler(rw http.ResponseWriter, req *http.Request) {
 
 	kv := req.URL.Query()
-	//fmt.Println(req.URL.String())
+
 	l1, _ := strconv.ParseFloat(kv["lat"][0], 64)
 	l2, _ := strconv.ParseFloat(kv["lng"][0], 64)
 	rad, _ := strconv.ParseFloat(kv["radius"][0], 64)
