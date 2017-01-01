@@ -2,6 +2,9 @@
 
 Find the closest food trucks filtered by distance, count, food variety
 
+<hr>
+[Foodtruck Locator]:https://uber-foodtrucks-ga.herokuapp.com
+
 ### Motivation
 While picking up GO figured to do a full fledged web app using GO for the back end and Google Maps API for the display of the truck locations.
 
